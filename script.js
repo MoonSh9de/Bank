@@ -13,40 +13,58 @@ const btnLogin = document.querySelector('.btn--login');
 const modalWindow = document.querySelector('.modal-window');
 const overlay = document.querySelector('.overlay');
 
-btnLogin.addEventListener('click', function() {
+let currentAccount;
 
+btnLogin.addEventListener('click', function(e) {
+    e.preventDefault();
     const inputName = document.querySelector('.input__name').value;
     const inputPin = document.querySelector('.input__pin').value;
+    currentAccount = accounts.find((account) => account.nickname === inputName);
 
-    if(inputName === '' || inputName !== account1.userName )
-    {
-        document.querySelector('.input__name').value = '';
-        document.querySelector('.input__name').placeholder = 'Такого имени пользователя нет!';
+    //! Посмотреть optional chaining
+    if(currentAccount?.pin === Number(inputPin)) {
+        modalWindow.classList.toggle('hidden');
+        overlay.classList.toggle('hidden');
+        //! Сделать приветствие для Usera
+        displayTransactions(currentAccount.transactions);
+        displayBalance(currentAccount);
+        displayTotal(currentAccount);
+        console.log('верно');
     }
-    else document.querySelector('.input__name').style.backgroundColor = 'white';
+    else {
 
-    if(inputPin === '' || inputPin !== account1.pin.toString() )
-    {
-        document.querySelector('.input__pin').value = '';
-        document.querySelector('.input__pin').placeholder = 'Неправильный PIN!';
+        console.log('неверно');
     }
-    else document.querySelector('.input__pin').style.backgroundColor = 'white';
 
-    if(inputName === account1.userName && inputPin === account1.pin.toString())
-    {
-        console.log('работает');
-        modalWindow.classList.add('hidden');
-        overlay.classList.add('hidden');
-    }
+    // if(inputName === '' || accounts.find((account) => account.nickaname !== inputName))
+    // {
+    //     document.querySelector('.input__name').value = '';
+    //     document.querySelector('.input__name').placeholder = 'Такого имени пользователя нет!';
+    // }
+    // else document.querySelector('.input__name').style.backgroundColor = 'white';
+
+    // if(inputPin === '' || accounts.find((account) => account.pin.toString() !== inputPin))
+    // {
+    //     document.querySelector('.input__pin').value = '';
+    //     document.querySelector('.input__pin').placeholder = 'Неправильный PIN!';
+    // }
+    // else document.querySelector('.input__pin').style.backgroundColor = 'white';
+
+    // if(inputName === account1.userName && inputPin === account1.pin.toString())
+    // {
+    //     console.log('работает');
+    //     modalWindow.classList.add('hidden');
+    //     overlay.classList.add('hidden');
+    // }
 });
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
 const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.total__value--in');
-const labelSumOut = document.querySelector('.total__value--out');
-const labelSumInterest = document.querySelector('.total__value--interest');
+const labeldepositesTotal = document.querySelector('.total__value--in');
+const labelwithdrawalsTotal = document.querySelector('.total__value--out');
+const labelinterestTotal = document.querySelector('.total__value--interest');
 const labelTimer = document.querySelector('.timer');
 
 const containerApp = document.querySelector('.app');
@@ -119,7 +137,7 @@ const displayTransactions = function(transactions) {
 
         const transactionRow = `<div class="transactions__row">
         <div class="transactions__type transactions__type--${transType}">
-        ${index+1} ${transType}
+        ${transType}
         </div>
         <div class="transactions__value">${trans}</div>
     </div>`
@@ -127,15 +145,90 @@ const displayTransactions = function(transactions) {
     })
 }
 
-const displayBalance = function(transactions) {
+const displayBalance = function(account) {
     labelBalance.innerHTML = '';
-    const balance = transactions.reduce((acc, trans) => acc + trans)
+    const balance = account.transactions.reduce((acc, trans) => acc + trans);
+    account.balance = balance;
     labelBalance.textContent = `${balance}$` ;
 }
 
-console.log(accounts);
+const updateUI = function(account) {
+    displayTransactions(account.transactions);
+    displayBalance(account);
+    displayTotal(account);
+}
+const displayTotal = function(account) {
 
-//Вызов функций
+    labeldepositesTotal.innerHTML = '';
+    labelinterestTotal.innerHTML = '';
+    labelwithdrawalsTotal.innerHTML = '';
+
+
+    const depositesTotal = account.transactions
+        .filter((trans) => trans > 0)
+        .reduce((acc, trans) => acc + trans, 0);
+
+    const withdrawalsTotal = Math.abs(account.transactions.
+        filter((trans) => trans < 0)
+        .reduce((acc,trans) => acc+ trans, 0));
+
+    const interestTotal = account.transactions
+        .filter((trans) => trans > 0)
+        .map((dep) => (dep * account.interest / 100))
+        .reduce((acc, int) => acc + int, 0);
+
+
+    labeldepositesTotal.textContent = `${depositesTotal}$`;
+    labelwithdrawalsTotal.textContent = `${withdrawalsTotal}$`;
+    labelinterestTotal.textContent = `${interestTotal}$`
+}
+
 createNicknames(accounts);
-displayTransactions(account1.transactions);
-displayBalance(account1.transactions)
+
+btnTransfer.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const transferAmount = Number(inputTransferAmount.value);
+    const recipientNickname = inputTransferTo.value;
+    const recipientAccount = accounts.find((account) => account.nickname === recipientNickname);
+    console.log(transferAmount,recipientAccount);
+
+    inputTransferTo.value = '';
+    inputTransferAmount.value = '';
+
+    if(transferAmount > 0 && currentAccount.balance >= transferAmount && recipientAccount && recipientNickname !== currentAccount.nickname) {
+        console.log(currentAccount.transactions);
+        currentAccount.transactions.push(-transferAmount);
+        recipientAccount.transactions.push(transferAmount);
+        updateUI(currentAccount);
+        console.log(accounts);
+    }
+});
+
+btnClose.addEventListener('click', function(e) {
+    e.preventDefault();
+    const closeNicknameAccount = inputCloseUsername.value;
+    const clocePinAccount = Number(inputClosePin.value);
+    if(currentAccount.nickname === closeNicknameAccount && currentAccount.pin === clocePinAccount) {
+        const currentAccountIndex = accounts.findIndex((account) => account.nickname === currentAccount.nickname);
+        console.log(currentAccountIndex);
+        accounts.splice(currentAccountIndex, 1);
+        //! Сделать обнуление всего интерфейса и перехода к другому пользователю
+        modalWindow.classList.toggle('hidden');
+        overlay.classList.toggle('hidden');
+    }
+});
+
+//* Займ
+//! Сделать сообщение, что денег не хватает
+btnLoan.addEventListener('click', function(e) {
+    e.preventDefault();
+    const loanAmount = Number(inputLoanAmount.value);
+    if(loanAmount > 0 && currentAccount.transactions.some((trans) => trans >= loanAmount / 10))
+    {
+        currentAccount.transactions.push(loanAmount);
+        updateUI(currentAccount);
+    }
+    inputLoanAmount.value = '';
+})
+

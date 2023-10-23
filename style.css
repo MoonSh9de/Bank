@@ -43,7 +43,7 @@ input {
     z-index: 10;
 }
 
-.logo--modal {
+.logo {
     width: 200px;
     height: 200px;
 }
@@ -86,19 +86,6 @@ input {
     background-color: #29adec;
 }
 
-.welcome {
-
-    margin: 2rem 0;
-
-    font-size: 2rem;
-    letter-spacing: 10px;
-    text-transform: uppercase;
-    color: #040542;
-    font-weight: 200;
-    position: absolute;
-    left: 50%;
-    top: 15%;
-}
 
 .overlay {
     width: 100%;
@@ -125,12 +112,14 @@ input {
     position: relative;
     max-width: 100rem;
     margin: 4rem auto;
+    padding: 2rem;
     display: grid;
     grid-template-columns: 4fr 3fr;
     grid-template-rows: auto repeat(3, 15rem) auto;
     gap: 2rem;
 
-
+    border: 3px solid #def4ff;
+    border-radius: 10%;
     /* Create fade anumation */
     transition: all 1s;
   }
@@ -214,21 +203,25 @@ input {
   }
 
   .total__label {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     font-weight: 500;
     text-transform: uppercase;
     margin-right: 0.8rem;
   }
 
   .total__value {
-    font-size: 2.2rem;
-    margin-right: 2.5rem;
+    font-size: 1.7rem;
+    margin-right: 1.5rem;
   }
 
-  .total__value--in,
+  .total__value--in {
+    color: #22af5d;
+  }
+
   .total__value--interest {
     color: #399bb3;
   }
+
 
   .total__value--out {
     color: #f07b0d;
@@ -238,7 +231,7 @@ input {
     margin-left: auto;
     border: none;
     background: none;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 500;
     cursor: pointer;
   }
@@ -261,3 +254,16 @@ input {
   .operation--close {
     background-image: linear-gradient(to top left, #e93c07, #d36c71);
   }
+
+  .welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: 0 auto;
+
+    width: 960px;
+    height: 220px;
+
+  }
+
