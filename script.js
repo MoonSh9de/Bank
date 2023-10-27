@@ -127,11 +127,12 @@ const createNicknames = function(accs) {
         acc.nickname = acc.userName.toUpperCase().split(' ').map((word) => word[0]).join('');
     })
 };
-
-const displayTransactions = function(transactions) {
+//* C сортировкой
+const displayTransactions = function(transactions, sort = false) {
+    const transacs = sort ? transactions.slice().sort((x, y ) => x - y) : transactions;
 
     containerTransactions.innerHTML = '';
-    transactions.forEach(function(trans, index) {
+    transacs.forEach(function(trans, index) {
 
         const transType = trans > 0 ? 'deposit' : 'withdrawal'
 
@@ -230,5 +231,12 @@ btnLoan.addEventListener('click', function(e) {
         updateUI(currentAccount);
     }
     inputLoanAmount.value = '';
-})
+});
+//* Сортировка
+let transactionsSorted = false;
+btnSort.addEventListener('click', function(e) {
+    e.preventDefault();
+    displayTransactions(currentAccount.transactions, !transactionsSorted);
+    transactionsSorted = !transactionsSorted;
+});
 
