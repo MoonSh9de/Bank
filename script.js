@@ -240,3 +240,18 @@ btnSort.addEventListener('click', function(e) {
     transactionsSorted = !transactionsSorted;
 });
 
+//Array.from() example
+
+
+
+const logoImage = document.querySelector('.logo--open');
+
+logoImage.addEventListener('click', function() {
+    const transactionsUI = document.querySelectorAll('.transactions__value');
+    // const transactionsUIArray = Array.from(transactionsUI);
+    // console.log(transactionsUIArray.map(elem => Number(elem.textContent)));
+
+    const transactionsUIArray = Array.from(transactionsUI, elem => Number(elem.textContent));
+    console.log(transactionsUIArray);
+})
+
